@@ -89,7 +89,7 @@ function order_exporter_page() {
             });
 
             if (selectedOrders.length === 0) {
-                alert("Please select at least one order.");
+                //alert("Please select at least one order.");
                 return;
             }
 
@@ -120,7 +120,7 @@ function order_exporter_page() {
             });
 
             if (selectedOrders.length === 0) {
-                alert("Please select at least one order.");
+               // alert("Please select at least one order.");
                 return;
             }
 
@@ -294,7 +294,7 @@ function processing_orders_page() {
                     box_size: boxSize
                 },
                 success: function(response) {
-                    alert('Box size saved successfully.');
+                 //   alert('Box size saved successfully.');
                 }
             });
             });
@@ -312,7 +312,7 @@ function processing_orders_page() {
                         weight: weight
                     },
                     success: function(response) {
-                        alert('Box size saved successfully.');
+                        //alert('Box size saved successfully.');
                     }
                 });
             });
@@ -867,7 +867,7 @@ function generate_csv_shipstation_file() {
             'Weight(gr)' => $weight,
             'Custom Field 1' => '',
             'Custom Field 2' => '',
-            'Custom Field 3' => $phone,
+            'Custom Field 3' => $order->get_id(),
             'Recipient First Name' => $first_name,
             'Recipient Last Name' => $last_name,
             'Recipient Phone' => $phone,
@@ -941,7 +941,7 @@ function load_custom_wp_admin_style() {
                 box_size: boxSize
             },
             success: function(response) {
-                alert('Box size saved successfully.');
+               // alert('Box size saved successfully.');
             }
         });
         });
@@ -959,7 +959,7 @@ function load_custom_wp_admin_style() {
                     weight: weight
                 },
                 success: function(response) {
-                    alert('Box size saved successfully.');
+                    //alert('Box size saved successfully.');
                 }
             });
         });
