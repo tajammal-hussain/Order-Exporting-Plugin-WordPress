@@ -706,9 +706,9 @@ function generate_csv_shipstation_file() {
             'Recipient First Name' => $order_details['first_name'],
             'Recipient Last Name' => $order_details['last_name'],
             'Recipient Phone' => $order_details['phone'],
-            'Address Line 1' => $order_details['centimetre_length'],
-            'Address Line 2' => $order_details['centimetre_width'],
-            'City' => $order_details['centimetre_height'],
+            'Address Line 1' => $order_details['address_1'],
+            'Address Line 2' => $order_details['address_2'],
+            'City' => $order_details['city'],
             'State' => $order_details['shipping_state_code'],
             'Postal Code' => $order_details['postcode'],
             'Country Code' => $order_details['shipping_country_code'],
@@ -767,7 +767,7 @@ function generate_csv_automate_file() {
     {
         $response = wp_remote_post($webhook_url, [
             'method'    => 'POST',
-            'body'      => json_encode(['file_url' => $upload_dir['url'] . '/' . basename($csv_file)]),
+            'body'      => json_encode( $csv_string),
             'headers'   => [
                 'Content-Type' => 'application/json',
             ],
