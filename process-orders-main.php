@@ -12,27 +12,6 @@ if (!defined('ABSPATH')) {
 }
 
 
-
-
-// Define the data array as a global variable
-global $box_sizes;
-$box_sizes = [
-    "PG - Large" => [27, 21, 6],
-    "PG - Medium" => [25, 18, 5],
-    "PG - Small" => [23, 16, 3],
-    "White - Extra Large" => [33, 26, 8],
-    "White - Extra Tall Large" => [31, 23, 15],
-    "White - Large" => [33, 25, 8],
-    "White - Medium" => [26, 21, 6],
-    "White - Small" => [25, 16, 3],
-    "Brown - Large" => [26, 23, 18],
-    "Brown - Small" => [23, 23, 12],
-    "Tall Small" => [19, 10, 6],
-    "New Large" => [29, 24, 9],
-    "New Small" => [24, 16, 9],
-];
-
-
 // Add a menu item in WooCommerce admin
 add_action('admin_menu', 'order_exporter_menu');
 
@@ -41,7 +20,7 @@ function order_exporter_menu() {
     add_menu_page(
         'Order Exporter', // Page title
         'Order Exporter', // Menu title
-        'edit_shop_orders', // Capability required
+        'manage_woocommerce', // WooCommerce administrator capability
         'order-exporter', // Menu slug
         'order_exporter_page', // Callback to display the page
         'dashicons-cart',
@@ -137,24 +116,41 @@ function order_exporter_page() {
         document.getElementById('export-sendle').addEventListener('click', function() {
             // Collect the selected order IDs
             var selectedOrders = [];
+            var selectWeight = [];
+            var selectedBox = [];
             document.querySelectorAll('.order-checkbox:checked').forEach(function(checkbox) {
                   // Find the closest <tr> to the checkbox
                   var row = checkbox.closest('tr');
                 
                 // Find the <select> element within that row with class 'order-box'
                 var selectElement = row.querySelector('select.order-box');
+                var weightElement = row.querySelector('input.order-weight');
                 
                 // Check if the value is null or an empty string (""), meaning no selection has been made
                 if (selectElement.value === '' || selectElement.value == null) {
                     return; // Exit if no valid selection
                 }
-                selectedOrders.push(checkbox.closest('tr').getAttribute('data-order-id'));
+               // Push an object containing the select value, weight value, and order ID
+
+                    selectedOrders.push(
+                        checkbox.closest('tr').getAttribute('data-order-id')
+                    );
+                    selectWeight.push(
+                        weightElement.value
+                    );
+
+                    selectedBox.push(
+                        JSON.parse(selectElement.value)
+                    );
+
             });
 
             if (selectedOrders.length === 0) {
                 //alert("Please select at least one order.");
                 return;
             }
+            console.log(selectedOrders);
+            
 
             // Show a message that the process is ongoing
             document.getElementById('csv-message').innerHTML = 'Generating CSV file, please wait...';
@@ -162,7 +158,9 @@ function order_exporter_page() {
             // Send the selected orders to the backend for CSV generation
             var data = {
                 action: 'generate_csv_sendle',
-                orders: selectedOrders
+                orderId: selectedOrders,
+                orderBox: selectedBox,
+                orderWeight: selectWeight
             };
 
             jQuery.post(ajaxurl, data, function(response) {
@@ -178,18 +176,32 @@ function order_exporter_page() {
         document.getElementById('export-shipstation').addEventListener('click', function() {
             // Collect the selected order IDs
             var selectedOrders = [];
+            var selectWeight = [];
+            var selectedBox = [];
             document.querySelectorAll('.order-checkbox:checked').forEach(function(checkbox) {
-                  // Find the closest <tr> to the checkbox
-                  var row = checkbox.closest('tr');
+                   // Find the closest <tr> to the checkbox
+                   var row = checkbox.closest('tr');
                 
                 // Find the <select> element within that row with class 'order-box'
                 var selectElement = row.querySelector('select.order-box');
+                var weightElement = row.querySelector('input.order-weight');
                 
                 // Check if the value is null or an empty string (""), meaning no selection has been made
                 if (selectElement.value === '' || selectElement.value == null) {
                     return; // Exit if no valid selection
                 }
-                selectedOrders.push(checkbox.closest('tr').getAttribute('data-order-id'));
+               // Push an object containing the select value, weight value, and order ID
+
+                    selectedOrders.push(
+                        checkbox.closest('tr').getAttribute('data-order-id')
+                    );
+                    selectWeight.push(
+                        weightElement.value
+                    );
+
+                    selectedBox.push(
+                        JSON.parse(selectElement.value)
+                    );
             });
 
             if (selectedOrders.length === 0) {
@@ -203,7 +215,9 @@ function order_exporter_page() {
             // Send the selected orders to the backend for CSV generation
             var data = {
                 action: 'generate_csv_shipstation',
-                orders: selectedOrders
+                orderId: selectedOrders,
+                orderBox: selectedBox,
+                orderWeight: selectWeight               
             };
 
             jQuery.post(ajaxurl, data, function(response) {
@@ -219,18 +233,32 @@ function order_exporter_page() {
         document.getElementById('automate-orders').addEventListener('click', function() {
             // Collect the selected order IDs
             var selectedOrders = [];
+            var selectWeight = [];
+            var selectedBox = [];
             document.querySelectorAll('.order-checkbox:checked').forEach(function(checkbox) {
-                 // Find the closest <tr> to the checkbox
-                var row = checkbox.closest('tr');
+                   // Find the closest <tr> to the checkbox
+                   var row = checkbox.closest('tr');
                 
                 // Find the <select> element within that row with class 'order-box'
                 var selectElement = row.querySelector('select.order-box');
+                var weightElement = row.querySelector('input.order-weight');
                 
                 // Check if the value is null or an empty string (""), meaning no selection has been made
                 if (selectElement.value === '' || selectElement.value == null) {
                     return; // Exit if no valid selection
                 }
-                selectedOrders.push(checkbox.closest('tr').getAttribute('data-order-id'));
+               // Push an object containing the select value, weight value, and order ID
+
+                    selectedOrders.push(
+                        checkbox.closest('tr').getAttribute('data-order-id')
+                    );
+                    selectWeight.push(
+                        weightElement.value
+                    );
+
+                    selectedBox.push(
+                        JSON.parse(selectElement.value)
+                    );
             });
 
             if (selectedOrders.length === 0) {
@@ -245,15 +273,16 @@ function order_exporter_page() {
             // Send the selected orders to the backend for CSV generation
             var data = {
                 action: 'generate_csv_automate',
-                orders: selectedOrders
-            };
+                orderId: selectedOrders,
+                orderBox: selectedBox,
+                orderWeight: selectWeight                };
 
             jQuery.post(ajaxurl, data, function(response) {
                 // Handle response from the server
                 if (response.success) {
-                    document.getElementById('csv-message').innerHTML = 'Data has been done generated successfully!';
+                    document.getElementById('csv-message').innerHTML = 'CSV file generated successfully! <a href="' + response.data.file_url + '" target="_blank">Download Now</a>';
                 } else {
-                    document.getElementById('csv-message').innerHTML = 'An error occurred while generating the Wehbook file.';
+                    document.getElementById('csv-message').innerHTML = 'An error occurred while generating the CSV file.';
                 }
             });
         });
@@ -265,7 +294,7 @@ function order_exporter_page() {
 
 function processing_orders_page() {
 
-    global $wpdb, $box_sizes;
+        global $wpdb;
         
         $query = "
             SELECT p.ID  
@@ -295,8 +324,6 @@ function processing_orders_page() {
         $total_processing_orders = count($results);
 
         my_get_template('admin-template.php', [
-            'title' => 'All Processing Orders',
-            'data' => $box_sizes,
             'total_processing_orders' => $total_processing_orders,
             'results' => $results,
         ]);
@@ -339,7 +366,7 @@ function save_box_weight() {
 }
 
 function exported_orders_page() {
-   global $wpdb, $box_sizes;
+   global $wpdb;
 
     $query = "
         SELECT p.ID 
@@ -358,16 +385,15 @@ function exported_orders_page() {
     });
     
     $total_processing_orders = count($results);
+
     my_get_template('admin-template.php', [
-        'title' => 'Exported Orders',
-        'data' => $box_sizes,
         'total_processing_orders' => $total_processing_orders,
         'results' => $results,
     ]);
     
 }
 function po_boxes_page(){
-    global $wpdb, $box_sizes;
+    global $wpdb;
 
     $query = "
         SELECT p.ID  
@@ -389,8 +415,6 @@ function po_boxes_page(){
     $boxes = get_option('wc_package_boxes', []);
 
     my_get_template('admin-template.php', [
-        'title' => 'PO Box Orders',
-        'data' => $box_sizes,
         'total_processing_orders' => $total_processing_orders,
         'results' => $results,
     ]);
@@ -507,7 +531,7 @@ function render_box_settings_field() {
                 <input type="number" name="wc_package_boxes[<?php echo $index; ?>][width]" value="<?php echo esc_attr($box['width']); ?>" placeholder="Width (cm)">
                 <input type="number" name="wc_package_boxes[<?php echo $index; ?>][height]" value="<?php echo esc_attr($box['height']); ?>" placeholder="Height (cm)">
                 <button type="button" class="delete-box">Delete Box</button>
-                </div>
+            </div>
         <?php endforeach; ?>
     </div>
     <button type="button" id="add-box">Add Box</button>
@@ -564,11 +588,13 @@ function get_order_details($order_id) {
 
     $box_params = get_post_meta($order->get_id(), 'box_size', true);
     $box_params = json_decode($box_params, true);
-    $centimetre_length = empty($box_params) ? '' : $box_params['value'][0];
-    $centimetre_width = empty($box_params) ? '' : $box_params['value'][1];
-    $centimetre_height = empty($box_params) ? '' : $box_params['value'][2];
+    $centimetre_length = empty($box_params) ? '' : $box_params['length'];
+    $centimetre_width = empty($box_params) ? '' : $box_params['width'];
+    $centimetre_height = empty($box_params) ? '' : $box_params['height'];
+
     $box_weight = get_post_meta($order->get_id(), 'box_weight', true);
     $weight = empty($box_weight) ? '750' : $box_weight; // Default weight
+    
     return [
         'first_name' => $first_name,
         'last_name' => $last_name,
@@ -662,22 +688,23 @@ register_deactivation_hook(__FILE__, 'deactivate_cron_job');
 add_action('wp_ajax_generate_csv_sendle', 'generate_csv_sendle_file');
 
 function generate_csv_sendle_file() {
-    // Check nonce for security (if needed)
-    // if ( ! isset( $_POST['nonce_field'] ) || ! wp_verify_nonce( $_POST['nonce_field'], 'nonce_action' ) ) {
-    //    die('Permission denied');
-    // }
-
+    
     // Get the order IDs from the request
-    $order_ids = isset($_POST['orders']) ? $_POST['orders'] : [];
+    $orderId = isset($_POST['orderId']) ? $_POST['orderId'] : [];
+    $selectBox = isset($_POST['orderBox']) ? $_POST['orderBox'] : [];
+    $selectWeight = isset($_POST['orderWeight']) ? $_POST['orderWeight'] : [];
 
-    if (empty($order_ids)) {
+
+    if (empty($orderId) || empty($selectBox) || empty($selectWeight)) {
         wp_send_json_error(['message' => 'No orders selected.']);
     }
 
     // Prepare the CSV data
     $csv_data = [];
-    foreach ($order_ids as $order_id) {
+    $i = 0;
+    foreach ($orderId as $order_id) {
         $order_details = get_order_details($order_id);
+        $box_params = $selectBox[$i];
         $csv_data[] = [
             'receiver_name' => $order_details['full_name'],
             'receiver_address_line1' => $order_details['address_1'],
@@ -689,14 +716,14 @@ function generate_csv_sendle_file() {
             'receiver_contact_number' => $order_details['phone'],
             'delivery_instructions' => '',
             'customer_reference' => $order_details['order_number'],
-            'kilogram_weight' => $order_details['weight'],
-            'centimetre_length' => $order_details['centimetre_length'],
-            'centimetre_width' => $order_details['centimetre_width'],
-            'centimetre_height' => $order_details['centimetre_height'],
+            'kilogram_weight' => $selectWeight[$i],
+            'centimetre_length' => $box_params['length'],
+            'centimetre_width' => $box_params['width'],
+            'centimetre_height' => $box_params['height'],
             'pickup_date' => '',
         ];
+        $i++;
     }
-
     // Create a CSV file
     $file_url = create_csv_file($csv_data, 'sendle_orders_' . time() . '.csv');
 
@@ -720,22 +747,27 @@ add_action('wp_ajax_generate_csv_shipstation', 'generate_csv_shipstation_file');
 function generate_csv_shipstation_file() {
 
     // Get the order IDs from the request
-    $order_ids = isset($_POST['orders']) ? $_POST['orders'] : [];
+    $orderId = isset($_POST['orderId']) ? $_POST['orderId'] : [];
+    $selectBox = isset($_POST['orderBox']) ? $_POST['orderBox'] : [];
+    $selectWeight = isset($_POST['orderWeight']) ? $_POST['orderWeight'] : [];
 
-    if (empty($order_ids)) {
+
+    if (empty($orderId) || empty($selectBox) || empty($selectWeight)) {
         wp_send_json_error(['message' => 'No orders selected.']);
     }
 
     // Prepare the CSV data
     $csv_data = [];
-    foreach ($order_ids as $order_id) {
+    $i = 0;
+    foreach ($orderId as $order_id) {
         $order_details = get_order_details($order_id);
+        $box_params = $selectBox[$i];
         $csv_data[] = [
             'Order #' => $order_details['order_number'],
-            'Height(cm)' => $order_details['centimetre_height'],
-            'Length(cm)' => $order_details['centimetre_length'],
-            'Width(cm)' => $order_details['centimetre_width'],
-            'Weight(gr)' => $order_details['weight'],
+            'Height(cm)' => $box_params['height'],
+            'Length(cm)' => $box_params['length'],
+            'Width(cm)' => $box_params['width'],
+            'Weight(gr)' => $selectWeight[$i],
             'Custom Field 1' => '',
             'Custom Field 2' => '',
             'Custom Field 3' => $order_details['order_id'],
@@ -749,11 +781,12 @@ function generate_csv_shipstation_file() {
             'Postal Code' => $order_details['postcode'],
             'Country Code' => $order_details['shipping_country_code'],
         ];
+        $i++;
     }
 
 
     // Create a CSV file
-    $file_url = create_csv_file($csv_data, 'shipstation_' . time() . '.csv');
+    $file_url = create_csv_file($csv_data, 'shipstation_orders_' . time() . '.csv');
 
     // Mark orders as exported
     mark_orders_as_exported($order_ids);
@@ -769,36 +802,49 @@ add_action('generate_csv_automate_cron_job', 'generate_csv_automate_file');
 add_action('wp_ajax_generate_csv_automate', 'generate_csv_automate_file');
 
 function generate_csv_automate_file() {
+  
     // Get the order IDs from the request
-    $order_ids = isset($_POST['orders']) ? $_POST['orders'] : [];
+    $orderId = isset($_POST['orderId']) ? $_POST['orderId'] : [];
+    $selectBox = isset($_POST['orderBox']) ? $_POST['orderBox'] : [];
+    $selectWeight = isset($_POST['orderWeight']) ? $_POST['orderWeight'] : [];
 
-    if (empty($order_ids)) {
+
+    if (empty($orderId) || empty($selectBox) || empty($selectWeight)) {
         wp_send_json_error(['message' => 'No orders selected.']);
     }
 
     // Prepare the CSV data
     $csv_data = [];
-    foreach ($order_ids as $order_id) {
+    $i = 0;
+    foreach ($orderId as $order_id) {
         $order_details = get_order_details($order_id);
-        $order_details['postcode'] = str_replace(' ', '', $order_details['postcode']);
+        $box_params = $selectBox[$i];
         $csv_data[] = [
             'order_id' => $order_details['order_id'],
             'order_number' => $order_details['order_number'],
-            'centimetre_length' => $order_details['centimetre_length'],
-            'centimetre_width' => $order_details['centimetre_width'],
-            'centimetre_height' => $order_details['centimetre_height'],
-            'grams_weight' => $order_details['weight'],
+            'centimetre_length' => $box_params['length'],
+            'centimetre_width' => $box_params['width'],
+            'centimetre_height' => $box_params['height'],
+            'grams_weight' => $selectWeight[$i],
             'postal_code' => $order_details['postcode'],
         ];
+        $i++;
     }
+
+    // Create a CSV file
+    $file_url = create_csv_file($csv_data, 'automate_orders_' . time() . '.csv');
+
+    // Mark orders as exported
+    mark_orders_as_exported($order_ids);
 
     //Get Options 
     $webhook_url = get_option('wc_order_settings', '');
+
     if(!empty($webhook_url))
     {
         $response = wp_remote_post($webhook_url, [
             'method'    => 'POST',
-            'body'      => json_encode( $csv_data),
+            'body'      => json_encode( $csv_string),
             'headers'   => [
                 'Content-Type' => 'application/json',
             ],
@@ -806,15 +852,14 @@ function generate_csv_automate_file() {
     
         if (is_wp_error($response)) {
             error_log('Webhook request failed: ' . $response->get_error_message());
-            wp_send_json_error(['message' => 'Webhook request failed: ' . $response->get_error_message()]);
         } else {
             error_log('Webhook request succeeded: ' . wp_remote_retrieve_body($response));
-            wp_send_json_success(['response' =>  wp_remote_retrieve_body($response)]);
         }
     }
     
 
     // Return the file URL
+    wp_send_json_success(['file_url' => $file_url]);
 }
 
 /**
@@ -823,8 +868,58 @@ function generate_csv_automate_file() {
 add_action('admin_footer', 'load_custom_wp_admin_style');
 
 function load_custom_wp_admin_style() {
-    
+    $screen = get_current_screen();
+    if ($screen->id !== 'order-exporter') {
+        return;
+    }
     ?>
-    
+       <!-- JavaScript to Handle Select All Functionality -->
+       <script type="text/javascript">
+    document.getElementById('select-all').addEventListener('change', function() {
+        // Get all checkboxes with class "order-checkbox"
+        var checkboxes = document.querySelectorAll('.order-checkbox');
+        // Loop through all checkboxes and set their checked state
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = document.getElementById('select-all').checked;
+        });
+    });
+    jQuery(document).ready(function($) {
+    $('.order-box').change(function() {
+        var boxSize = $(this).val();
+        var orderId = $(this).closest('.order-row').data('order-id');
+        
+        $.ajax({
+            url: '<?php echo admin_url('admin-ajax.php'); ?>',
+            type: 'POST',
+            data: {
+                action: 'save_box_size',
+                order_id: orderId,
+                box_size: boxSize
+            },
+            success: function(response) {
+               // alert('Box size saved successfully.');
+            }
+        });
+        });
+
+        $('.order-weight').change(function() {
+            var weight = $(this).val();
+            var orderId = $(this).closest('.order-row').data('order-id');
+            
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                type: 'POST',
+                data: {
+                    action: 'save_box_weight',
+                    order_id: orderId,
+                    weight: weight
+                },
+                success: function(response) {
+                    //alert('Box size saved successfully.');
+                }
+            });
+        });
+    });
+    </script>
 <?php
 }

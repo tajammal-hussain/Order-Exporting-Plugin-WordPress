@@ -1,5 +1,10 @@
+<?php
+
+
+$boxes = get_option('wc_package_boxes', []);
+    ?>
     <div class="wrap">
-    <h1><?php echo $title; ?> (<?php echo $total_processing_orders; ?>)</h1>
+    <h1>Exported Orders (<?php echo $total_processing_orders; ?>)</h1>
 
     <table class="wp-list-table widefat fixed striped posts" style="margin-top:15px;">
         <thead>
@@ -30,6 +35,7 @@
                 $shipping_state_full_name = isset($states[$shipping_state_code]) ? $states[$shipping_state_code] : $shipping_state_code;
                 
                 $box_params = get_post_meta($order_id, 'box_size', true);
+                $box_params = json_decode($box_params, true);
                 
                 $box_weight = get_post_meta($order_id, 'box_weight', true);
                 $weight = empty($box_weight) ? '750' : $box_weight; // Default weight
@@ -70,17 +76,17 @@
                 <td>
                     <select class="order-box" id="order-box">
                         <option value="">Select a box</option>
-                        <?php foreach ($data as $key => $value): ?>
-                            <?php 
-                            var_dump($box_params);
-                            $option_data = json_encode(['key' => $key, 'value' => $value]);
-                            $selected = (!empty($box_params) && $box_params === $option_data) ? 'selected' : '';
-                            ?>
-                            <option value="<?php echo esc_attr($option_data); ?>" <?php echo $selected; ?>>
-                                <?php echo esc_html($key); ?>
+                        <?php foreach ($boxes as $box): ?>
+                            <option value="<?php echo esc_attr(json_encode($box)); ?>" 
+                                    <?php 
+                                    if(!empty($box_params)):
+                                        echo in_array($box['name'], $box_params) ? 'selected' : ''; 
+                                    endif;
+                                    ?>
+                            >
+                                <?php echo esc_html($box['name']); ?>
                             </option>
                         <?php endforeach; ?>
-
                     </select>
                 </td>
                 <td><input type="number" class="order-weight" id="order-weight" value="<?php echo esc_attr($weight); ?>"></td>
@@ -96,53 +102,54 @@
         </tbody>
     </table>
     </div>
-   <!-- JavaScript to Handle Select All Functionality -->
-   <script type="text/javascript">
-    document.getElementById('select-all').addEventListener('change', function() {
-        // Get all checkboxes with class "order-checkbox"
-        var checkboxes = document.querySelectorAll('.order-checkbox');
-        // Loop through all checkboxes and set their checked state
-        checkboxes.forEach(function(checkbox) {
-            checkbox.checked = document.getElementById('select-all').checked;
-        });
-    });
-    jQuery(document).ready(function($) {
-    $('.order-box').change(function() {
-        var boxSize = $(this).val();
-        var orderId = $(this).closest('tr.order-row').data('order-id');
-        console.log(orderId);
-        
-        $.ajax({
-            url: '<?php echo admin_url('admin-ajax.php'); ?>',
-            type: 'POST',
-            data: {
-                action: 'save_box_size',
-                order_id: orderId,
-                box_size: boxSize
-            },
-            success: function(response) {
-               // alert('Box size saved successfully.');
-            }
-        });
-        });
 
-        $('.order-weight').change(function() {
-            var weight = $(this).val();
+ 
+       <!-- JavaScript to Handle Select All Functionality -->
+       <script type="text/javascript">
+        document.getElementById('select-all').addEventListener('change', function() {
+            // Get all checkboxes with class "order-checkbox"
+            var checkboxes = document.querySelectorAll('.order-checkbox');
+            // Loop through all checkboxes and set their checked state
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = document.getElementById('select-all').checked;
+            });
+        });
+        jQuery(document).ready(function($) {
+        $('.order-box').change(function() {
+            var boxSize = $(this).val();
             var orderId = $(this).closest('.order-row').data('order-id');
             
             $.ajax({
                 url: '<?php echo admin_url('admin-ajax.php'); ?>',
                 type: 'POST',
                 data: {
-                    action: 'save_box_weight',
+                    action: 'save_box_size',
                     order_id: orderId,
-                    weight: weight
+                    box_size: boxSize
                 },
                 success: function(response) {
-                    //alert('Box size saved successfully.');
+                    
                 }
             });
+            });
+
+            $('.order-weight').change(function() {
+                var weight = $(this).val();
+                var orderId = $(this).closest('.order-row').data('order-id');
+                
+                $.ajax({
+                    url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                    type: 'POST',
+                    data: {
+                        action: 'save_box_weight',
+                        order_id: orderId,
+                        weight: weight
+                    },
+                    success: function(response) {
+
+                    }
+                });
+            });
         });
-    });
     </script>
     <?php
