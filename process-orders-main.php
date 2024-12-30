@@ -324,6 +324,7 @@ function processing_orders_page() {
         $total_processing_orders = count($results);
 
         my_get_template('admin-template.php', [
+            'title' => 'All Processing Orders',
             'total_processing_orders' => $total_processing_orders,
             'results' => $results,
         ]);
@@ -387,6 +388,7 @@ function exported_orders_page() {
     $total_processing_orders = count($results);
 
     my_get_template('admin-template.php', [
+        'title' => 'Exported Orders',
         'total_processing_orders' => $total_processing_orders,
         'results' => $results,
     ]);
@@ -415,6 +417,7 @@ function po_boxes_page(){
     $boxes = get_option('wc_package_boxes', []);
 
     my_get_template('admin-template.php', [
+        'title' => 'PO Box Orders',
         'total_processing_orders' => $total_processing_orders,
         'results' => $results,
     ]);
@@ -728,7 +731,7 @@ function generate_csv_sendle_file() {
     $file_url = create_csv_file($csv_data, 'sendle_orders_' . time() . '.csv');
 
     // Mark orders as exported
-    mark_orders_as_exported($order_ids);
+    mark_orders_as_exported($orderId);
     // Return the file URL
     wp_send_json_success(['file_url' => $file_url]);
 }
@@ -789,7 +792,7 @@ function generate_csv_shipstation_file() {
     $file_url = create_csv_file($csv_data, 'shipstation_orders_' . time() . '.csv');
 
     // Mark orders as exported
-    mark_orders_as_exported($order_ids);
+    mark_orders_as_exported($orderId);
 
     // Return the file URL
     wp_send_json_success(['file_url' => $file_url]);
@@ -835,7 +838,7 @@ function generate_csv_automate_file() {
     $file_url = create_csv_file($csv_data, 'automate_orders_' . time() . '.csv');
 
     // Mark orders as exported
-    mark_orders_as_exported($order_ids);
+    mark_orders_as_exported($orderId);
 
     //Get Options 
     $webhook_url = get_option('wc_order_settings', '');

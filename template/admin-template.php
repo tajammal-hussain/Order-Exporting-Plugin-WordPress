@@ -4,7 +4,7 @@
 $boxes = get_option('wc_package_boxes', []);
     ?>
     <div class="wrap">
-    <h1>Exported Orders (<?php echo $total_processing_orders; ?>)</h1>
+    <h1><?php echo $title ?> (<?php echo $total_processing_orders; ?>)</h1>
 
     <table class="wp-list-table widefat fixed striped posts" style="margin-top:15px;">
         <thead>
