@@ -8,14 +8,14 @@ $boxes = get_option('wc_package_boxes', []);
 
     <table class="wp-list-table widefat fixed striped posts" style="margin-top:15px;">
         <thead>
-                <th scope="col" class="manage-column"><input type="checkbox" id="select-all"></th>
-                <th scope="col" class="manage-column"><strong>Order</strong></th>
-                <th scope="col" class="manage-column"><strong>Date</strong></th>
-                <th scope="col" class="manage-column"><strong>Box Size</strong></th>
-                <th scope="col" class="manage-column"><strong>Weight (gr)</strong></th>
-                <th scope="col" class="manage-column"><strong>Name</strong></th>
-                <th scope="col" class="manage-column"><strong>Shipping State</strong></th>
-                <th scope="col" class="manage-column"><strong>Shipping Address</strong></th>
+                <th scope="col" class="manage-column" style="width:20px;"><input type="checkbox" id="select-all"></th>
+                <th scope="col" class="manage-column" style="width:50px;"><strong>Order</strong></th>
+                <th scope="col" class="manage-column" style="width:120px;"><strong>Date</strong></th>
+                <th scope="col" class="manage-column" style="width:160px;"><strong>Box Size</strong></th>
+                <th scope="col" class="manage-column" style="width: 180px;"><strong>Weight (gr)</strong></th>
+                <th scope="col" class="manage-column" style="width: 250px;"><strong>Name</strong></th>
+                <th scope="col" class="manage-column" style="width: 120px;"><strong>Shipping State</strong></th>
+                <th scope="col" class="manage-column" ><strong>Shipping Address</strong></th>
         </thead>
         <tbody>
         <?php

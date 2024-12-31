@@ -822,6 +822,25 @@ function generate_csv_automate_file() {
     foreach ($orderId as $order_id) {
         $order_details = get_order_details($order_id);
         $box_params = $selectBox[$i];
+        $order_details['postcode'] = str_replace(' ', '', $order_details['postcode']);
+
+        // Get the custom field PG_Shipping_Speed
+        $shipping_speed = get_post_meta($order_id, 'PG_Shipping_Speed', true);
+
+        // Get shipping address details
+        $shipping_first_name = get_post_meta($order_id, '_shipping_first_name', true);
+        $shipping_last_name = get_post_meta($order_id, '_shipping_last_name', true);
+        $shipping_address_1 = get_post_meta($order_id, '_shipping_address_1', true);
+        $shipping_address_2 = get_post_meta($order_id, '_shipping_address_2', true);
+        $shipping_city = get_post_meta($order_id, '_shipping_city', true);
+        $shipping_state = get_post_meta($order_id, '_shipping_state', true);
+
+        // Get customer phone number (fallback to default if not available)
+        $customer_phone = get_post_meta($order_id, '_billing_phone', true);
+        if (empty($customer_phone)) {
+            $customer_phone = '9999999999';
+        }
+
         $csv_data[] = [
             'order_id' => $order_details['order_id'],
             'order_number' => $order_details['order_number'],
@@ -830,9 +849,17 @@ function generate_csv_automate_file() {
             'centimetre_height' => $box_params['height'],
             'grams_weight' => $selectWeight[$i],
             'postal_code' => $order_details['postcode'],
+            'shipping_speed' => $shipping_speed, // Custom field
+            'shipping_name' => $shipping_first_name . ' ' . $shipping_last_name, // Shipping full name
+            'shipping_address_1' => $shipping_address_1,
+            'shipping_address_2' => $shipping_address_2,
+            'shipping_city' => $shipping_city,
+            'shipping_state' => $shipping_state,
+            'customer_phone' => $customer_phone, // Customer phone
         ];
         $i++;
     }
+
 
     // Create a CSV file
     $file_url = create_csv_file($csv_data, 'automate_orders_' . time() . '.csv');
@@ -847,7 +874,7 @@ function generate_csv_automate_file() {
     {
         $response = wp_remote_post($webhook_url, [
             'method'    => 'POST',
-            'body'      => json_encode( $csv_string),
+            'body'      => json_encode( $csv_data),
             'headers'   => [
                 'Content-Type' => 'application/json',
             ],
